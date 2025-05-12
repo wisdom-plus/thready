@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Thready - {{ .Thread.Title }}</title>
+  </head>
+  <body>
+    <h1>{{ .Thread.Title }}</h1>
+
+    <h2>投稿一覧</h2>
+    <ul>
+      {{ range .Messages }}
+        <li>{{ .Content }}</li>
+      {{ else }}
+        <li>まだ投稿がありません。</li>
+      {{ end }}
+    </ul>
+
+    <a href="/threads">スレッド一覧に戻る</a>
+  </body>
+</html>
