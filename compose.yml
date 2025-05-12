@@ -1,11 +1,11 @@
-service:
+services:
   web:
     build: .
-    valumes:
+    volumes:
       - .:/app
     ports:
       - "8080:8080"
-    working_dir: /app
+    working_dir: /app/src
     depends_on:
       - db
     environment:
@@ -18,13 +18,13 @@ service:
   db:
     image: postgres:15
     environment:
-      - POSTGRES_USER: thready
-      - POSTGRES_PASSWORD: secret
-      - POSTGRES_DB: thready
+      - POSTGRES_USER=thready
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=thready
     ports:
       - "5432:5432"
     volumes:
-      - pgdate:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
