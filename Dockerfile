@@ -1,7 +1,16 @@
 FROM golang:1.24.3-alpine3.21
 
+# Airのインストール
+RUN go install github.com/cosmtrek/air@latest
+
 WORKDIR /app
 
-RUN go install github.com/air-verse/air@latest
+COPY go.mod ./
+COPY go.sum ./
+RUN go mod download
 
-CMD ["air", "-c", ".air.toml"]
+COPY . .
+
+WORKDIR /app/src
+
+CMD [ "air" ]

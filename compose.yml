@@ -6,6 +6,7 @@ services:
     ports:
       - "8080:8080"
     working_dir: /app/src
+    command: air
     depends_on:
       - db
     environment:
@@ -14,7 +15,7 @@ services:
       - DB_USER=thready
       - DB_PASSWORD=secret
       - DB_NAME=thready
-  
+
   db:
     image: postgres:15
     environment:
