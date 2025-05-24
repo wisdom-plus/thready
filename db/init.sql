@@ -1,5 +1,12 @@
-CREATE TABLE threads {
-  id SERIAL PRIMARY KEY,
-  title TEXT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-}
+CREATE TABLE threads (
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE messages (
+    id SERIAL PRIMARY KEY,
+    thread_id INTEGER REFERENCES threads(id),
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
