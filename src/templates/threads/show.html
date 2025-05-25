@@ -16,6 +16,15 @@
     {{ end }}
   </ul>
 
+  <h2>メッセージを投稿する</h2>
+  {{ if .Error }}
+    <p style="color: red;">{{ .Error }}</p>
+  {{ end }}
+
+  <form action="/threads/{{ .Thread.ID }}/messages" method="post">
+    <textarea name="content" rows="4" cols="50"></textarea><br>
+    <input type="submit" value="投稿">
+  </form>
   <a href="/threads">← スレッド一覧に戻る</a>
 </body>
 </html>
