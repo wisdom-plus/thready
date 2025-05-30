@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"thready/src/models"
+    "thready/src/utils"
 )
 
 func HandleThreadShowOrPost(w http.ResponseWriter, r *http.Request) {
@@ -47,15 +48,17 @@ func HandleThreadShowOrPost(w http.ResponseWriter, r *http.Request) {
         r.ParseForm()
         content := strings.TrimSpace(r.FormValue("content"))
 
-        if content == "" {
+        content, errMsg := utils.ValidateMessageContent(content)
+        if errMsg != "" {
             tpl := template.Must(template.ParseFiles("templates/layout.html", "templates/threads/show.html"))
             tpl.ExecuteTemplate(w, "layout", map[string]interface{}{
                 "Thread":   thread,
                 "Messages": messages,
-                "Error": "メッセージの入力がされていません",
+                "Error": errMsg,
             })
             return
         }
+
         _, err := models.CreateMessage(id, content)
         if err != nil {
             http.Error(w, "メッセージの作成に失敗しました", http.StatusInternalServerError)

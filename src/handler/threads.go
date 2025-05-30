@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"thready/src/models"
+    "thready/src/utils"
 )
 
 func HandleThreads(w http.ResponseWriter, r *http.Request) {
@@ -25,19 +26,11 @@ func HandleThreads(w http.ResponseWriter, r *http.Request) {
         r.ParseForm()
         title := strings.TrimSpace(r.FormValue("title"))
 
-        if title == "" {
+        title, errMsg := utils.ValidateThreadTitle(title)
+        if errMsg != "" {
             tpl := template.Must(template.ParseFiles("templates/layout.html", "templates/threads/new.html"))
             tpl.ExecuteTemplate(w, "layout", map[string]interface{}{
-                "Error": "タイトルの入力がされていません",
-                "Title": title,
-            })
-            return
-        }
-
-        if len(title) > 255 {
-            tpl := template.Must(template.ParseFiles("templates/layout.html", "templates/threads/new.html"))
-            tpl.ExecuteTemplate(w, "layout", map[string]interface{}{
-                "Error": "タイトルは255文字以内で入力してください",
+                "Error": errMsg,
                 "Title": title,
             })
             return
