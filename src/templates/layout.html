@@ -1,0 +1,14 @@
+{{ define "layout" }}
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <title>{{ block "title" . }}Thready{{ end }}</title>
+  </head>
+  <body>
+    <main>
+      {{ block "content" . }}{{ end }}
+    </main>
+  </body>
+</html>
+{{ end }}
