@@ -8,9 +8,15 @@ import (
 )
 
 func main() {
+    // データベースの初期化
     db.InitDB()
-
+    // ホームページのハンドラ
     http.HandleFunc("/", handler.HandleHome)
+    // User関連のハンドラ
+    http.HandleFunc("/users/new", handler.HandleUserNew)
+    http.HandleFunc("/users", handler.HandleUsers)
+    http.HandleFunc("/mypage", handler.HandleMyPage)
+    // Thread関連のハンドラ
     http.HandleFunc("/threads", handler.HandleThreads)
     http.HandleFunc("/threads/new", handler.HandleThreadNew)
     http.HandleFunc("/threads/", handler.HandleThreadShowOrPost)
