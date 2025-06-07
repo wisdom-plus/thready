@@ -27,3 +27,29 @@ func ValidateMessageContent(content string) (string, string) {
 	}
 	return content, ""
 }
+
+func ValidateUsername(username string) (string, string) {
+	if len(username) < 3 {
+		return username, "ユーザー名は3文字以上でなければなりません。"
+	}
+	if len(username) > 20 {
+		return username, "ユーザー名は20文字以下でなければなりません。"
+	}
+	if strings.TrimSpace(username) == "" {
+		return username, "ユーザー名が空白です。"
+	}
+	return username, ""
+}
+
+func ValidatePassword(password string) (string, string) {
+	if len(password) < 6 {
+		return password, "パスワードは6文字以上でなければなりません。"
+	}
+	if len(password) > 100 {
+		return password, "パスワードは100文字以下でなければなりません。"
+	}
+	if strings.TrimSpace(password) == "" {
+		return password, "パスワードが空白です。"
+	}
+	return password, ""
+}
