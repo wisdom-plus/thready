@@ -18,9 +18,12 @@ func GetAllThreads() ([]Thread, error) {
     return threads, err
 }
 
-func CreateThread(title string) (int, error) {
+func CreateThread(title string, userID int) (int, error) {
     var id int
-    err := db.DB.QueryRow("INSERT INTO threads (title) VALUES ($1) RETURNING id", title).Scan(&id)
+    err := db.DB.QueryRow("INSERT INTO threads (title, user_id) VALUES ($1, $2) RETURNING id", title, userID).Scan(&id)
+    if err != nil {
+        return 0, err
+    }
     return id, err
 }
 
