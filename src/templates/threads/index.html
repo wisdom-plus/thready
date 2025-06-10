@@ -9,5 +9,9 @@
       <li>まだスレッドがありません。</li>
     {{ end }}
   </ul>
-  <a href="/threads/new">スレッドを作成する</a>
+  {{ if .IsLoggedIn }}
+    <a href="/threads/new">スレッドを作成する</a>
+  {{ else }}
+    <p>スレッドを作成するには<a href="/signup">ユーザー登録し</a><a href="/login">ログイン</a>してください。</p>
+  {{ end }}
 {{ end }}

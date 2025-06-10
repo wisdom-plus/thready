@@ -1,0 +1,12 @@
+{{ define "title" }}マイページ - Thready{{ end }}
+
+{{ define "content" }}
+<h2>マイページ</h2>
+
+<p><strong>ユーザー名：</strong> {{ .User.Name }}</p>
+
+<form action="/logout" method="post">
+    <button type="submit">ログアウト</button>
+</form>
+
+{{ end }}
