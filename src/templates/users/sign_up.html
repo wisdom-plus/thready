@@ -1,0 +1,19 @@
+{{ define "title" }}ユーザー登録 - Thready{{ end }}
+
+{{ define "content" }}
+<h2>ユーザー登録</h2>
+
+{{ if .Error }}
+  <p style="color:red;">{{ .Error }}</p>
+{{ end }}
+
+<form method="post" action="/signup">
+  <label>ユーザー名：</label><br>
+  <input type="text" name="username" value="{{ .Username }}"><br><br>
+
+  <label>パスワード：</label><br>
+  <input type="password" name="password"><br><br>
+
+  <button type="submit">登録</button>
+</form>
+{{ end }}

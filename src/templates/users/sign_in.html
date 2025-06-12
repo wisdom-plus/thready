@@ -1,0 +1,19 @@
+{{ define "title" }}ログイン - Thready{{ end }}
+
+{{ define "content" }}
+<h2>ログイン</h2>
+
+{{ if .Error }}
+  <p style="color:red;">{{ .Error }}</p>
+{{ end }}
+
+<form method="post" action="/login">
+  <label>Name：</label><br>
+  <input type="text" name="username" value="{{ .UserName }}"><br><br>
+
+  <label>パスワード：</label><br>
+  <input type="password" name="password"><br><br>
+
+  <button type="submit">ログイン</button>
+</form>
+{{ end }}
