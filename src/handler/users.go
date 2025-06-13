@@ -10,36 +10,38 @@ import (
 	"thready/src/utils"
 )
 
-func HandleUsers(w http.ResponseWriter, r *http.Request) {
+func HandleSignUp(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 		case http.MethodGet:
+			tpl := template.Must(template.ParseFiles("templates/layout.html", "templates/users/sign_up.html"))
+			tpl.ExecuteTemplate(w, "layout", nil)
 		case http.MethodPost:
 			r.ParseForm()
 			username := strings.TrimSpace(r.FormValue("username"))
 			password := strings.TrimSpace(r.FormValue("password"))
-			username, errMsg := utils.ValidateUsername(username)
-			if errMsg != "" {
-				tpl := template.Must(template.ParseFiles("templates/layout.html", "templates/users/new.html"))
+			username, userErrMsg := utils.ValidateUsername(username)
+			if userErrMsg != "" {
+				tpl := template.Must(template.ParseFiles("templates/layout.html", "templates/users/sign_up.html"))
 				tpl.ExecuteTemplate(w, "layout", map[string]interface{}{
-					"Error":   errMsg,
+					"Error":   userErrMsg,
 					"Username": username,
 					"Password": password,
 				})
 				return
 			}
-			password, errMsg := utils.ValidatePassword(password)
-			if errMsg != "" {
-				tpl := template.Must(template.ParseFiles("templates/layout.html", "templates/users/new.html"))
+			password, passwordErrMsg := utils.ValidatePassword(password)
+			if passwordErrMsg != "" {
+				tpl := template.Must(template.ParseFiles("templates/layout.html", "templates/users/sign_up.html"))
 				tpl.ExecuteTemplate(w, "layout", map[string]interface{}{
-					"Error":   errMsg,
+					"Error":   passwordErrMsg,
 					"Username": username,
 					"Password": password,
 				})
 				return
 			}
-			id, err := models.CreateUser(username, password)
+			user_id, err := models.CreateUser(username, password)
 			if err != nil {
-				tpl := template.Must(template.ParseFiles("templates/layout.html", "templates/users/new.html"))
+				tpl := template.Must(template.ParseFiles("templates/layout.html", "templates/users/sign_up.html"))
 				tpl.ExecuteTemplate(w, "layout", map[string]interface{}{
 					"Error":   "ユーザーの作成に失敗しました",
 					"Username": username,
@@ -47,20 +49,34 @@ func HandleUsers(w http.ResponseWriter, r *http.Request) {
 				})
 				return
 			}
+			cookie := &http.Cookie{
+				Name:  "user_id",
+				Value: strconv.Itoa(user_id),
+				Path:  "/",
+				HttpOnly: true,
+				Secure: true,
+				MaxAge:  86400,
+			}
+			http.SetCookie(w, cookie)
 			http.Redirect(w, r, "/mypage", http.StatusSeeOther)
 		default:
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
 }
 
-func HandlerUserNew(w http.ResponseWriter, r *http.Request) {
-		tpl := template.Must(template.ParseFiles("templates/layout.html", "templates/users/new.html"))
-		tpl.ExecuteTemplate(w, "layout", nil)
-}
-
 func HandleMyPage(w http.ResponseWriter, r *http.Request) {
 	// ユーザー情報を取得
-	user, err := models.GetCurrentUser(r)
+	user_id, err := r.Cookie("user_id")
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	id, err := strconv.Atoi(user_id.Value)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	user, err := models.GetCurrentUser(id)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
@@ -70,4 +86,80 @@ func HandleMyPage(w http.ResponseWriter, r *http.Request) {
 	tpl.ExecuteTemplate(w, "layout", map[string]interface{}{
 		"User": user,
 	})
+}
+
+func HandleLogin(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+		case http.MethodGet:
+			tpl := template.Must(template.ParseFiles("templates/layout.html", "templates/users/sign_in.html"))
+			tpl.ExecuteTemplate(w, "layout", nil)
+		case http.MethodPost:
+			r.ParseForm()
+			username := strings.TrimSpace(r.FormValue("username"))
+			password := strings.TrimSpace(r.FormValue("password"))
+			username, userErrMsg := utils.ValidateUsername(username)
+			if userErrMsg != "" {
+				tpl := template.Must(template.ParseFiles("templates/layout.html", "templates/users/sign_in.html"))
+				tpl.ExecuteTemplate(w, "layout", map[string]interface{}{
+					"Error":   userErrMsg,
+					"Username": username,
+					"Password": password,
+				})
+				return
+			}
+			password, passwordErrMsg := utils.ValidatePassword(password)
+			if passwordErrMsg != "" {
+				tpl := template.Must(template.ParseFiles("templates/layout.html", "templates/users/sign_in.html"))
+				tpl.ExecuteTemplate(w, "layout", map[string]interface{}{
+					"Error":   passwordErrMsg,
+					"Username": username,
+					"Password": password,
+				})
+				return
+			}
+			hashPassword, hashErr := utils.HashPassword(password)
+			if hashErr != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				return
+			}
+			user, err := models.FindUserByLogin(username, hashPassword)
+			if err != nil {
+				tpl := template.Must(template.ParseFiles("templates/layout.html", "templates/users/sign_in.html"))
+				tpl.ExecuteTemplate(w, "layout", map[string]interface{}{
+					"Error":   "ユーザー名またはパスワードが間違っています",
+					"Username": username,
+					"Password": password,
+				})
+				return
+			}
+			cookie := &http.Cookie{
+				Name:  "user_id",
+				Value: strconv.Itoa(user.ID),
+				Path:  "/",
+				HttpOnly: true,
+				Secure: true,
+				MaxAge:  86400,
+			}
+			http.SetCookie(w, cookie)
+			http.Redirect(w, r, "/mypage", http.StatusSeeOther)
+		default:
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
+func HandleLogout(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodPost:
+		cookie := &http.Cookie{
+				Name:   "user_id",
+				Value:  "",
+				Path:   "/",
+				MaxAge: -1,
+		}
+		http.SetCookie(w, cookie)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	}
 }

@@ -13,6 +13,7 @@ import (
 func HandleThreads(w http.ResponseWriter, r *http.Request) {
     switch r.Method {
     case http.MethodGet:
+        userID, _ := utils.GetCurrentUserID(r)
         tpl := template.Must(template.ParseFiles("templates/layout.html", "templates/threads/index.html"))
         threads, err := models.GetAllThreads()
         if err != nil {
@@ -21,6 +22,7 @@ func HandleThreads(w http.ResponseWriter, r *http.Request) {
         }
         tpl.ExecuteTemplate(w, "layout", map[string]interface{}{
             "Threads": threads,
+            "IsLoggedIn": userID != 0,
         })
     case http.MethodPost:
         r.ParseForm()
@@ -36,7 +38,7 @@ func HandleThreads(w http.ResponseWriter, r *http.Request) {
             return
         }
 
-        id, err := models.CreateThread(title)
+        id, err := models.CreateThread(title, userID)
         if err != nil {
             http.Error(w, "スレッドの作成に失敗しました", http.StatusInternalServerError)
             return
@@ -50,6 +52,13 @@ func HandleThreads(w http.ResponseWriter, r *http.Request) {
 
 // 新規スレッドフォーム
 func HandleThreadNew(w http.ResponseWriter, r *http.Request) {
+    userID, err := utils.GetCurrentUserID(r)
+    if err != nil || userID == 0 {
+        http.Redirect(w, r, "/login", http.StatusSeeOther)
+        return
+    }
     tpl := template.Must(template.ParseFiles("templates/layout.html", "templates/threads/new.html"))
-    tpl.ExecuteTemplate(w, "layout", nil)
+    tpl.ExecuteTemplate(w, "layout", map[string]interface{}{
+        "UserID": userID,
+    })
 }
