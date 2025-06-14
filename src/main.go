@@ -13,8 +13,9 @@ func main() {
     // ホームページのハンドラ
     http.HandleFunc("/", handler.HandleHome)
     // User関連のハンドラ
-    http.HandleFunc("/users/new", handler.HandleUserNew)
-    http.HandleFunc("/users", handler.HandleUsers)
+    http.HandleFunc("/signup", handler.HandleSignUp)
+    http.HandleFunc("/login", handler.HandleLogin)
+    http.HandleFunc("/logout", handler.HandleLogout)
     http.HandleFunc("/mypage", handler.HandleMyPage)
     // Thread関連のハンドラ
     http.HandleFunc("/threads", handler.HandleThreads)
