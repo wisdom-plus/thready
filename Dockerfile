@@ -1,7 +1,7 @@
 FROM golang:1.24.3-alpine3.21
 
 # Airのインストール
-RUN go install github.com/cosmtrek/air@latest
+RUN go install github.com/air-verse/air@latest
 
 WORKDIR /app
 
