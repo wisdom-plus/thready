@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Minimal VPC template for Fargate deployment
+
+Resources:
+  ThreadyVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: thready-vpc
+
+  ThreadyInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: thready-igw
+
+  ThreadyAttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref ThreadyVPC
+      InternetGatewayId: !Ref ThreadyInternetGateway
+
+  ThreadyPublicSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ThreadyVPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      MapPublicIpOnLaunch: true
+
+  ThreadyPublicSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ThreadyVPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: !Select [ 1, !GetAZs '' ]
+      MapPublicIpOnLaunch: true
+
+  ThreadyRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref ThreadyVPC
+      Tags:
+        - Key: Name
+          Value: thready-rt
+
+  ThreadyRoute:
+    Type: AWS::EC2::Route
+    DependsOn: ThreadyAttachGateway
+    Properties:
+      RouteTableId: !Ref ThreadyRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref ThreadyInternetGateway
+
+  ThreadySubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref ThreadyPublicSubnetA
+      RouteTableId: !Ref ThreadyRouteTable
+
+  ThreadySubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref ThreadyPublicSubnetB
+      RouteTableId: !Ref ThreadyRouteTable
+
+Outputs:
+  VpcId:
+    Description: VPC ID
+    Value: !Ref ThreadyVPC
+
+  PublicSubnet1:
+    Description: Public Subnet A
+    Value: !Ref ThreadyPublicSubnetA
+
+  PublicSubnet2:
+    Description: Public Subnet B
+    Value: !Ref ThreadyPublicSubnetB
