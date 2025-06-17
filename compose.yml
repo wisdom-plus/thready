@@ -1,6 +1,6 @@
 services:
   web:
-    build: .
+    build: ./Dockerfile.dev
     volumes:
       - .:/app
     ports:
