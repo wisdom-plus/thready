@@ -17,6 +17,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /app/main .
 FROM debian:bullseye-slim
 WORKDIR /app
 COPY --from=builder /app/main .
+COPY src/templates ./templates
 
 EXPOSE 8080
 CMD ["./main"]

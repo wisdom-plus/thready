@@ -15,6 +15,7 @@ services:
       - DB_USER=thready
       - DB_PASSWORD=secret
       - DB_NAME=thready
+      - DATABASE_URL=postgres://thready:secret@db:5432/thready?sslmode=disable
 
   db:
     image: postgres:15
