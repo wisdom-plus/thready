@@ -11,6 +11,7 @@ func main() {
     // データベースの初期化
     db.InitDB()
     // ホームページのハンドラ
+    http.HandleFunc("/ping", handler.HandlePing)
     http.HandleFunc("/", handler.HandleHome)
     // User関連のハンドラ
     http.HandleFunc("/signup", handler.HandleSignUp)
