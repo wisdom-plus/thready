@@ -54,7 +54,6 @@ func HandleSignUp(w http.ResponseWriter, r *http.Request) {
 				Value: strconv.Itoa(user_id),
 				Path:  "/",
 				HttpOnly: true,
-				Secure: true,
 				MaxAge:  86400,
 			}
 			http.SetCookie(w, cookie)
@@ -137,7 +136,6 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 				Value: strconv.Itoa(user.ID),
 				Path:  "/",
 				HttpOnly: true,
-				Secure: true,
 				MaxAge:  86400,
 			}
 			http.SetCookie(w, cookie)
