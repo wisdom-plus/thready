@@ -25,6 +25,11 @@ func HandleThreads(w http.ResponseWriter, r *http.Request) {
             "IsLoggedIn": userID != 0,
         })
     case http.MethodPost:
+        userID, err := utils.GetCurrentUserID(r)
+        if err != nil || userID == 0 {
+            http.Redirect(w, r, "/login", http.StatusSeeOther)
+            return
+        }
         r.ParseForm()
         title := strings.TrimSpace(r.FormValue("title"))
 
